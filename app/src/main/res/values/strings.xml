@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">projet_mobile</string>
+    <string name="home">Home</string>
+    <string name="all_books">Search</string>
+    <string name="cart">Cart</string>
+    <string name="profile">Profile</string>
+</resources>
