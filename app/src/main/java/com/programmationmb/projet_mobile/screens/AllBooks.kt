@@ -27,12 +27,13 @@ import com.programmationmb.projet_mobile.data.model.Book
 import com.programmationmb.projet_mobile.data.repository.BookRepository
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.unit.DpOffset
+import com.programmationmb.projet_mobile.R
 
 
 @Composable
 fun AllBooks(navController: NavController) {
 
-    val bookList = BookRepository.getAllBooks()
+    val bookList = BookRepository.getAllBooks().toList()
     var searchText by remember { mutableStateOf("") }
 
     Column(
@@ -247,13 +248,22 @@ fun BookItem(book: Book) {
                 .background(Color(0xFFEBEBEB)),
             contentAlignment = Alignment.Center // center the image inside the box
         ) {
-            Image(
-                painter = painterResource(id = book.image),
-                contentDescription = book.title,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .size(80.dp) // keep some padding inside container
-            )
+            if (book.image != null) {
+                Image(
+                    painter = painterResource(id = book.image),
+                    contentDescription = book.title,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(80.dp)
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.imagenf),
+                    contentDescription = "No image",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(50.dp)
+                )
+
+            }
         }
     }
 }

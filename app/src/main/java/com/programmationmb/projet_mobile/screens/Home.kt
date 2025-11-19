@@ -20,10 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.programmationmb.projet_mobile.components.BookCarousel
+import com.programmationmb.projet_mobile.data.AuthViewModel
 import com.programmationmb.projet_mobile.navigation.Screen
 
 @Composable
-fun Home(navController: NavController) {
+fun Home(navController: NavController, authViewModel: AuthViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,7 +54,13 @@ fun Home(navController: NavController) {
 
         // Get Started Button
         Button(
-            onClick = { navController.navigate(Screen.AllBooks.route) },
+            onClick = {
+                if (authViewModel.isLoggedIn.value) {
+                    navController.navigate(Screen.AllBooks.route)
+                } else {
+                    navController.navigate(Screen.Login.route)
+                }
+            },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF11D494), // background color
                 contentColor = Color.Black           // text color
