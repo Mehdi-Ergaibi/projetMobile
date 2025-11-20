@@ -43,7 +43,6 @@ fun Profile(
         Spacer(Modifier.height(30.dp))
 
         if (isLoggedIn) {
-            // Logged-in UI
             Text(
                 text = "Hello, $username ",
                 color = Color.White,
@@ -65,7 +64,6 @@ fun Profile(
             }
 
         } else {
-            // Guest UI
             Text(
                 text = "You must log in",
                 color = Color.Gray

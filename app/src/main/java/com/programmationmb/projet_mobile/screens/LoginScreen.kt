@@ -53,11 +53,9 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
             .padding(24.dp)
     ) {
 
-        // -------------------- MAIN FORM --------------------
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Top X icon
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
@@ -73,7 +71,6 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Title
             Text(
                 "Login",
                 color = Color.White,
@@ -83,7 +80,6 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Email input
             Text("Email", color = Color.Gray)
             BasicTextField(
                 value = email,
@@ -98,7 +94,6 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Password input with eye icon
             Text("Password", color = Color.Gray)
             Box(
                 modifier = Modifier
@@ -114,7 +109,6 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Eye icon
                 val icon = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
                 Image(
                     imageVector = icon,
@@ -130,7 +124,6 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Forgot password
             Text(
                 "Forgot password?",
                 color = Color.LightGray,
@@ -139,7 +132,6 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Error message
             if (authViewModel.errorMessage.value.isNotEmpty()) {
                 Text(
                     authViewModel.errorMessage.value,
@@ -149,7 +141,6 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Login button full width
             Button(
                 onClick = {
                     val success = authViewModel.login(email, password)
@@ -169,7 +160,6 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
             }
         }
 
-        // -------------------- REGISTER LINK AT BOTTOM --------------------
         Row(
             modifier = Modifier
                 .fillMaxWidth()

@@ -39,14 +39,13 @@ fun BookCarousel() {
         }
     }
 
-    // Card container
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 0.dp)   // ⭐ only left & right margin
+            .padding(horizontal = 0.dp)
             .height(280.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF5ECE3)  // ⭐ background color
+            containerColor = Color(0xFFF5ECE3)
         ),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(6.dp)
@@ -59,12 +58,12 @@ fun BookCarousel() {
             Image(
                 painter = painterResource(id = books[currentIndex]),
                 contentDescription = "Book",
-                contentScale = ContentScale.Fit,    // ⭐ show full image
+                contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(280.dp)
-                    .clip(RoundedCornerShape(16.dp)) // keeps shape
-                    .padding(top = 0.dp, bottom = 0.dp) // ⭐ no top/bottom padding
+                    .clip(RoundedCornerShape(16.dp))
+                    .padding(top = 0.dp, bottom = 0.dp)
             )
         }
     }

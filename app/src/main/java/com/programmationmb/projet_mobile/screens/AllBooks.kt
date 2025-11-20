@@ -39,31 +39,28 @@ fun AllBooks(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(12.dp) // background is from theme
+            .padding(12.dp)
     ) {
 
-        // ----------------- TOP BAR -------------------
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp), // optional height
+                .height(56.dp),
             contentAlignment = Alignment.CenterStart
         ) {
-            // Centered title
             Text(
                 text = "BookStore",
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                modifier = Modifier.align(Alignment.Center) // center in Box
+                modifier = Modifier.align(Alignment.Center)
             )
 
-            // Cart icon on the right
             Icon(
                 imageVector = Icons.Default.ShoppingCart,
                 contentDescription = "Cart",
                 tint = Color.White,
                 modifier = Modifier
-                    .align(Alignment.CenterEnd) // right side
+                    .align(Alignment.CenterEnd)
                     .padding(end = 12.dp)
                     .size(28.dp)
                     .clickable {
@@ -75,7 +72,6 @@ fun AllBooks(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ----------------- CUSTOM SEARCH BAR -------------------
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -109,10 +105,8 @@ fun AllBooks(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ----------------- FILTERS -------------------
         Row(
             modifier = Modifier.fillMaxWidth(),
-            //horizontalArrangement = Arrangement.SpaceBetween
 
         ) {
             FilterBox("Genre")
@@ -124,28 +118,26 @@ fun AllBooks(navController: NavController) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // ----------------- BOOK LIST -------------------
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(bookList) { book ->
-                BookItem(book)
+                BookItem(book, navController)
             }
         }
     }
 }
 
 
-// ----------------- FILTER BOX -------------------
 @Composable
 fun FilterRow() {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start // no space between
+        horizontalArrangement = Arrangement.Start
     ) {
         FilterBox("Genre")
-        Spacer(modifier = Modifier.width(8.dp)) // small gap between boxes
+        Spacer(modifier = Modifier.width(8.dp))
         FilterBox("Price")
         Spacer(modifier = Modifier.width(8.dp))
         FilterBox("Rating")
@@ -156,7 +148,6 @@ fun FilterRow() {
 fun FilterBox(title: String) {
     var expanded by remember { mutableStateOf(false) }
 
-    // Wrap clickable filter in a Box
     Box {
         Box(
             modifier = Modifier
@@ -174,7 +165,7 @@ fun FilterBox(title: String) {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            offset = DpOffset(x = 0.dp, y = 0.dp), // dropdown directly below the Box
+            offset = DpOffset(x = 0.dp, y = 0.dp),
             modifier = Modifier.background(Color(0xFF293933))
         ) {
             val options = when (title) {
@@ -196,18 +187,19 @@ fun FilterBox(title: String) {
 
 
 
-// ----------------- BOOK ITEM -------------------
 @Composable
-fun BookItem(book: Book) {
+fun BookItem(book: Book, navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
             .background(Color(0xFF1c2624))
+            .clickable {
+                navController.navigate("bookDetails/${book.id}")
+            }
             .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically // center everything vertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        // LEFT COLUMN: Texts and Price
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -227,11 +219,10 @@ fun BookItem(book: Book) {
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Price Box
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(6.dp))
-                    .background(Color(0xFF293933)) // price box color
+                    .background(Color(0xFF293933))
                     .padding(horizontal = 10.dp, vertical = 4.dp)
             ) {
                 Text("\$${book.price}", color = Color.White, fontWeight = FontWeight.Bold)
@@ -240,13 +231,12 @@ fun BookItem(book: Book) {
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        // RIGHT COLUMN: Image in container
         Box(
             modifier = Modifier
                 .size(100.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(Color(0xFFEBEBEB)),
-            contentAlignment = Alignment.Center // center the image inside the box
+            contentAlignment = Alignment.Center
         ) {
             if (book.image != null) {
                 Image(

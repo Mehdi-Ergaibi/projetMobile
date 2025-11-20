@@ -34,7 +34,6 @@ fun Home(navController: NavController, authViewModel: AuthViewModel) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Title
         Text(
             text = "Read Anywhere,\nAnytime...",
             color = Color.White,
@@ -47,12 +46,10 @@ fun Home(navController: NavController, authViewModel: AuthViewModel) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Carousel
         BookCarousel()
 
-        Spacer(modifier = Modifier.weight(1f))  // Push button to bottom
+        Spacer(modifier = Modifier.weight(1f))
 
-        // Get Started Button
         Button(
             onClick = {
                 if (authViewModel.isLoggedIn.value) {
@@ -62,8 +59,8 @@ fun Home(navController: NavController, authViewModel: AuthViewModel) {
                 }
             },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF11D494), // background color
-                contentColor = Color.Black           // text color
+                containerColor = Color(0xFF11D494),
+                contentColor = Color.Black
             ),
             shape = RoundedCornerShape(14.dp),
             modifier = Modifier

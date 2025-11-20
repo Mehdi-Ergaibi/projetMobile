@@ -52,7 +52,7 @@ fun BottomNavigationBar(
     )
 
     NavigationBar(
-        containerColor = Color(0xFF192223) // your color
+        containerColor = Color(0xFF192223)
     ) {
         navigationItems.forEachIndexed { index, item ->
             NavigationBarItem(

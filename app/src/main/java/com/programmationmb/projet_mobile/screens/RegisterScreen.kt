@@ -66,7 +66,6 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Input box helper
             @Composable
             fun inputBox(value: String, onChange: (String) -> Unit, placeholder: String) {
                 BasicTextField(
@@ -106,7 +105,6 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Sign Up Button (full width)
             Button(
                 onClick = {
                     if (password != confirmPassword) {
@@ -135,7 +133,6 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Join community link (Reddit)
             Text(
                 "Join our community of readers now",
                 color = Color.Gray,
@@ -148,7 +145,6 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
             )
         }
 
-        // Already have an account? Login - bottom
         Row(
             modifier = Modifier
                 .fillMaxWidth()

@@ -7,10 +7,8 @@ data class User(
 )
 
 object AuthRepository {
-    // Temporary storage only while app is open
     val users = mutableListOf<User>()
 
-    // Predefined account
     init {
         users.add(User(
             name = "mehdi",
@@ -21,7 +19,7 @@ object AuthRepository {
 
     fun register(user: User): Boolean {
         if (users.any { it.email == user.email }) {
-            return false // email already exists
+            return false
         }
         users.add(user)
         return true
