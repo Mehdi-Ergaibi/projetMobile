@@ -1,40 +1,55 @@
 package com.programmationmb.projet_mobile.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import com.programmationmb.projet_mobile.data.ProductViewModel
 import com.programmationmb.projet_mobile.data.model.Book
-import com.programmationmb.projet_mobile.data.repository.BookRepository
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.res.stringResource
 import com.programmationmb.projet_mobile.R
 
-
 @Composable
-fun AllBooks(navController: NavController) {
-
-    val bookList = BookRepository.getAllBooks().toList()
+fun AllBooks(navController: NavController, productViewModel: ProductViewModel) {
+    val uiState = productViewModel.uiState.collectAsState()
     var searchText by remember { mutableStateOf("") }
+
+    val filtered = uiState.value.products.filter {
+        it.title.contains(searchText, ignoreCase = true) ||
+                it.genre.contains(searchText, ignoreCase = true)
+    }
 
     Column(
         modifier = Modifier
@@ -49,7 +64,7 @@ fun AllBooks(navController: NavController) {
             contentAlignment = Alignment.CenterStart
         ) {
             Text(
-                text = "BookStore",
+                text = stringResource(id = R.string.bookstore_title),
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 modifier = Modifier.align(Alignment.Center)
@@ -87,7 +102,7 @@ fun AllBooks(navController: NavController) {
                 Box(modifier = Modifier.weight(1f)) {
                     if (searchText.isEmpty()) {
                         Text(
-                            text = "Search books...",
+                            text = stringResource(id = R.string.search_placeholder),
                             color = Color.Gray
                         )
                     }
@@ -103,89 +118,41 @@ fun AllBooks(navController: NavController) {
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-
-        ) {
-            FilterBox("Genre")
-            Spacer(modifier = Modifier.width(8.dp))
-            FilterBox("Price")
-            Spacer(modifier = Modifier.width(8.dp))
-            FilterBox("Rating")
-        }
-
         Spacer(modifier = Modifier.height(20.dp))
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(bookList) { book ->
-                BookItem(book, navController)
-            }
-        }
-    }
-}
-
-
-@Composable
-fun FilterRow() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start
-    ) {
-        FilterBox("Genre")
-        Spacer(modifier = Modifier.width(8.dp))
-        FilterBox("Price")
-        Spacer(modifier = Modifier.width(8.dp))
-        FilterBox("Rating")
-    }
-}
-
-@Composable
-fun FilterBox(title: String) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Box {
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(10.dp))
-                .background(Color(0xFF293933))
-                .clickable { expanded = true }
-                .padding(horizontal = 10.dp, vertical = 8.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(title, fontWeight = FontWeight.SemiBold, color = Color.White)
-                Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = Color.White)
-            }
-        }
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            offset = DpOffset(x = 0.dp, y = 0.dp),
-            modifier = Modifier.background(Color(0xFF293933))
-        ) {
-            val options = when (title) {
-                "Genre" -> listOf("Self-help", "Finance", "Fiction", "Business")
-                "Price" -> listOf("Low to High", "High to Low")
-                "Rating" -> listOf("5 Stars", "4 Stars", "3 Stars")
-                else -> listOf()
+        when {
+            uiState.value.loading && filtered.isEmpty() -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(stringResource(id = R.string.loading_products), color = Color.White)
+                }
             }
 
-            options.forEach {
-                DropdownMenuItem(
-                    text = { Text(it, color = Color.White) },
-                    onClick = { expanded = false }
+            uiState.value.error != null -> {
+                Text(
+                    text = uiState.value.error ?: "",
+                    color = Color.Red,
+                    modifier = Modifier.padding(16.dp)
                 )
             }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(filtered) { book ->
+                        BookItem(book, navController)
+                    }
+                }
+            }
         }
     }
 }
-
-
 
 @Composable
 fun BookItem(book: Book, navController: NavController) {
@@ -206,7 +173,7 @@ fun BookItem(book: Book, navController: NavController) {
         ) {
             if (book.bestSeller) {
                 Text(
-                    text = "BestSeller",
+                    text = stringResource(id = R.string.bestseller),
                     color = Color.Gray,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -215,7 +182,7 @@ fun BookItem(book: Book, navController: NavController) {
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(book.title, fontWeight = FontWeight.Bold, color = Color.White)
-            Text(book.author, color = Color.Gray)
+            Text(book.genre, color = Color.Gray)
 
             Spacer(modifier = Modifier.height(6.dp))
 
@@ -238,22 +205,11 @@ fun BookItem(book: Book, navController: NavController) {
                 .background(Color(0xFFEBEBEB)),
             contentAlignment = Alignment.Center
         ) {
-            if (book.image != null) {
-                Image(
-                    painter = painterResource(id = book.image),
-                    contentDescription = book.title,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.size(80.dp)
-                )
-            } else {
-                Image(
-                    painter = painterResource(id = R.drawable.imagenf),
-                    contentDescription = "No image",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.size(50.dp)
-                )
-
-            }
+            AsyncImage(
+                model = book.imageUrl,
+                contentDescription = book.title,
+                modifier = Modifier.size(90.dp)
+            )
         }
     }
 }

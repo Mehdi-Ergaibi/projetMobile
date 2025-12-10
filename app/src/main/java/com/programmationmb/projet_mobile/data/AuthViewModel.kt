@@ -1,45 +1,59 @@
 package com.programmationmb.projet_mobile.data
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.programmationmb.projet_mobile.data.repository.AuthRepository
-import com.programmationmb.projet_mobile.data.repository.User
+import androidx.lifecycle.viewModelScope
+import com.programmationmb.projet_mobile.data.repository.UserRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class AuthViewModel : ViewModel() {
+data class AuthUiState(
+    val loading: Boolean = false,
+    val error: String? = null
+)
 
-    val isLoggedIn = mutableStateOf(false)
-    val currentUser = mutableStateOf<User?>(null)
-    val errorMessage = mutableStateOf("")
+class AuthViewModel(
+    private val userRepository: UserRepository
+) : ViewModel() {
 
-    fun login(email: String, password: String): Boolean {
-        val user = AuthRepository.login(email, password)
-        return if (user != null) {
-            currentUser.value = user
-            isLoggedIn.value = true
-            errorMessage.value = ""
-            true
-        } else {
-            errorMessage.value = "Wrong email or password"
-            false
+    val loggedInUser = userRepository.loggedInUser.stateIn(
+        scope = viewModelScope,
+        started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000),
+        initialValue = null
+    )
+
+    private val _uiState = MutableStateFlow(AuthUiState())
+    val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
+
+    fun login(email: String, password: String, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            _uiState.value = AuthUiState(loading = true)
+            val result = userRepository.login(email, password)
+            _uiState.value = result.fold(
+                onSuccess = { AuthUiState(loading = false, error = null) },
+                onFailure = { AuthUiState(loading = false, error = it.message) }
+            )
+            if (result.isSuccess) onSuccess()
         }
     }
 
-    fun register(name: String, email: String, password: String): Boolean {
-        val success = AuthRepository.register(
-            User(name, email, password)
-        )
-
-        if (!success) {
-            errorMessage.value = "Email already exists"
-        } else {
-            errorMessage.value = ""
+    fun register(name: String, email: String, password: String, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            _uiState.value = AuthUiState(loading = true)
+            val result = userRepository.register(name, email, password)
+            _uiState.value = result.fold(
+                onSuccess = { AuthUiState(loading = false, error = null) },
+                onFailure = { AuthUiState(loading = false, error = it.message) }
+            )
+            if (result.isSuccess) onSuccess()
         }
-
-        return success
     }
 
     fun logout() {
-        isLoggedIn.value = false
-        currentUser.value = null
+        viewModelScope.launch {
+            userRepository.logout()
+        }
     }
 }

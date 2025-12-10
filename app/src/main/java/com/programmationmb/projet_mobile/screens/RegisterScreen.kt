@@ -10,7 +10,12 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +34,7 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var localError by remember { mutableStateOf("") }
+    val uiState = authViewModel.uiState.collectAsState()
 
     val context = LocalContext.current
 
@@ -99,9 +105,7 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
                 Text(localError, color = Color.Red)
             }
 
-            if (authViewModel.errorMessage.value.isNotEmpty()) {
-                Text(authViewModel.errorMessage.value, color = Color.Red)
-            }
+            uiState.value.error?.let { Text(it, color = Color.Red) }
 
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -116,8 +120,7 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
                         return@Button
                     }
                     localError = ""
-                    val success = authViewModel.register(name, email, password)
-                    if (success) {
+                    authViewModel.register(name, email, password) {
                         navController.navigate(Screen.Login.route)
                     }
                 },

@@ -11,6 +11,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,9 +23,12 @@ import androidx.navigation.NavController
 import com.programmationmb.projet_mobile.components.BookCarousel
 import com.programmationmb.projet_mobile.data.AuthViewModel
 import com.programmationmb.projet_mobile.navigation.Screen
+import androidx.compose.ui.res.stringResource
+import com.programmationmb.projet_mobile.R
 
 @Composable
 fun Home(navController: NavController, authViewModel: AuthViewModel) {
+    val currentUser = authViewModel.loggedInUser.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -35,7 +39,7 @@ fun Home(navController: NavController, authViewModel: AuthViewModel) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Read Anywhere,\nAnytime...",
+            text = stringResource(id = R.string.home_title),
             color = Color.White,
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
@@ -52,7 +56,7 @@ fun Home(navController: NavController, authViewModel: AuthViewModel) {
 
         Button(
             onClick = {
-                if (authViewModel.isLoggedIn.value) {
+                if (currentUser.value != null) {
                     navController.navigate(Screen.AllBooks.route)
                 } else {
                     navController.navigate(Screen.Login.route)
@@ -68,7 +72,7 @@ fun Home(navController: NavController, authViewModel: AuthViewModel) {
                 .padding(horizontal = 8.dp, vertical = 16.dp)
         ) {
             Text(
-                text = "Get Started",
+                text = stringResource(id = R.string.get_started),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )

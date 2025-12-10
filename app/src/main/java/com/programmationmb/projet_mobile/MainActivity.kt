@@ -12,19 +12,26 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.programmationmb.projet_mobile.ProjetMobileApp
+import com.programmationmb.projet_mobile.di.AppContainer
+import com.programmationmb.projet_mobile.services.CartMonitorService
 import com.programmationmb.projet_mobile.ui.theme.Projet_mobileTheme
+import android.content.Intent
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        startService(Intent(this, CartMonitorService::class.java))
+
+        val container: AppContainer = (application as ProjetMobileApp).container
         setContent {
             Projet_mobileTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = androidx.compose.material3.MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen()
+                    MainScreen(container)
                 }
             }
         }

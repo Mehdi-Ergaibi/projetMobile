@@ -4,4 +4,22 @@
     <string name="all_books">Search</string>
     <string name="cart">Cart</string>
     <string name="profile">Profile</string>
+    <string name="bookstore_title">BookStore</string>
+    <string name="search_placeholder">Search books...</string>
+    <string name="cart_empty">Your cart is empty</string>
+    <string name="loading_products">Loading products...</string>
+    <string name="added_to_cart_toast">Book added to cart</string>
+    <string name="channel_cart_title">Cart updates</string>
+    <string name="channel_cart_desc">Notifications about your cart</string>
+    <string name="notification_cart_added_title">Item added</string>
+    <string name="notification_cart_added_body">%1$s was added to your cart</string>
+    <string name="notification_cart_threshold_title">Cart total alert</string>
+    <string name="notification_cart_threshold_body">Your cart total is $%1$s</string>
+    <string name="home_title">Read Anywhere, Anytime...</string>
+    <string name="get_started">Get Started</string>
+    <string name="bestseller">BestSeller</string>
+    <string name="description_label">Description</string>
+    <string name="similar_books">Books you might like</string>
+    <string name="checkout">Checkout</string>
+    <string name="checkout_success">Order placed successfully</string>
 </resources>

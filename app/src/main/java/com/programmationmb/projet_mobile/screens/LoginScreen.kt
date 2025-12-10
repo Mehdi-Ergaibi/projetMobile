@@ -22,6 +22,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +47,7 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    val uiState = authViewModel.uiState.collectAsState()
 
     Box(
         modifier = Modifier
@@ -132,19 +134,15 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            if (authViewModel.errorMessage.value.isNotEmpty()) {
-                Text(
-                    authViewModel.errorMessage.value,
-                    color = Color.Red
-                )
+            uiState.value.error?.let {
+                Text(it, color = Color.Red)
             }
 
             Spacer(modifier = Modifier.height(10.dp))
 
             Button(
                 onClick = {
-                    val success = authViewModel.login(email, password)
-                    if (success) {
+                    authViewModel.login(email, password) {
                         navController.navigate(Screen.Home.route)
                     }
                 },

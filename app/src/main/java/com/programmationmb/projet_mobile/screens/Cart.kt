@@ -1,38 +1,52 @@
 package com.programmationmb.projet_mobile.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.programmationmb.projet_mobile.components.CartManager
-import com.programmationmb.projet_mobile.data.model.Book
+import coil.compose.AsyncImage
+import androidx.compose.ui.res.stringResource
+import com.programmationmb.projet_mobile.R
+import com.programmationmb.projet_mobile.data.CartViewModel
+import com.programmationmb.projet_mobile.data.repository.CartItemUi
+import android.widget.Toast
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CartScreen(navController: NavController) {
-    val cartItems by CartManager.cartItems.collectAsState()
-
-    val totalPrice by remember(cartItems) {
-        derivedStateOf {
-            cartItems.sumOf { it.price * it.quantity }
-        }
-    }
+fun CartScreen(navController: NavController, cartViewModel: CartViewModel) {
+    val cartItems = cartViewModel.cartItems.collectAsState()
+    val total = cartViewModel.total.collectAsState()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -53,9 +67,8 @@ fun CartScreen(navController: NavController) {
                 }
 
                 Text(
-                    text = "Cart",
+                text = stringResource(id = R.string.cart),
                     color = Color.White,
-                    fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -73,14 +86,21 @@ fun CartScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Total", color = Color.White, fontWeight = FontWeight.Bold)
-                    Text("$${"%.2f".format(totalPrice)}", color = Color.White)
+                    Text("Total", color = Color.White)
+                    Text("$${"%.2f".format(total.value)}", color = Color.White)
                 }
 
                 Spacer(Modifier.height(16.dp))
 
                 Button(
-                    onClick = {},
+                    onClick = {
+                        cartViewModel.clear()
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.checkout_success),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -88,13 +108,13 @@ fun CartScreen(navController: NavController) {
                         contentColor = Color.Black
                     )
                 ) {
-                    Text("Checkout")
+                    Text(stringResource(id = R.string.checkout))
                 }
             }
         }
     ) { padding ->
 
-        if (cartItems.isEmpty()) {
+        if (cartItems.value.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -102,7 +122,7 @@ fun CartScreen(navController: NavController) {
                     .background(Color.Black),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Your cart is empty", color = Color.White)
+                Text(stringResource(id = R.string.cart_empty), color = Color.White)
             }
         } else {
             LazyColumn(
@@ -112,10 +132,10 @@ fun CartScreen(navController: NavController) {
                     .background(Color.Black)
             ) {
                 items(
-                    items = cartItems,
-                    key = { it.id }
-                ) { book ->
-                    CartItem(book = book)
+                    items = cartItems.value,
+                    key = { it.book.id }
+                ) { item ->
+                    CartItem(item = item, cartViewModel = cartViewModel)
                 }
                 item { Spacer(Modifier.height(100.dp)) }
             }
@@ -124,16 +144,8 @@ fun CartScreen(navController: NavController) {
 }
 
 @Composable
-fun CartItem(book: Book) {
-    val cartItems by CartManager.cartItems.collectAsState()
-
-    val currentBook = cartItems.find { it.id == book.id }
-
-    if (currentBook == null) {
-        return
-    }
-
-    val currentQuantity = currentBook.quantity
+fun CartItem(item: CartItemUi, cartViewModel: CartViewModel) {
+    val currentQuantity = item.quantity
 
     Column(
         modifier = Modifier
@@ -155,25 +167,19 @@ fun CartItem(book: Book) {
                     .padding(4.dp),
                 contentAlignment = Alignment.Center
             ) {
-                if (book.image != null) {
-                    Image(
-                        painter = painterResource(book.image),
-                        contentDescription = book.title,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit
-                    )
-                } else {
-                    Text("No Image", color = Color.Black, fontSize = 10.sp)
-                }
+                AsyncImage(
+                    model = item.book.imageUrl,
+                    contentDescription = item.book.title,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
             Spacer(Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = book.title,
+                    text = item.book.title,
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
                     color = Color.White,
                     maxLines = 2
                 )
@@ -181,9 +187,8 @@ fun CartItem(book: Book) {
                 Spacer(Modifier.height(4.dp))
 
                 Text(
-                    text = "$${book.price}",
+                    text = "$${item.book.price}",
                     fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
                     color = Color.Gray
                 )
             }
@@ -207,11 +212,7 @@ fun CartItem(book: Book) {
 
                 Button(
                     onClick = {
-                        if (currentQuantity > 1) {
-                            CartManager.updateQuantity(book.id, currentQuantity - 1)
-                        } else {
-                            CartManager.updateQuantity(book.id, 0)
-                        }
+                        cartViewModel.updateQuantity(item.book.id, currentQuantity - 1)
                     },
                     modifier = Modifier.size(30.dp),
                     contentPadding = PaddingValues(0.dp),
@@ -232,7 +233,7 @@ fun CartItem(book: Book) {
 
                 Button(
                     onClick = {
-                        CartManager.updateQuantity(book.id, currentQuantity + 1)
+                        cartViewModel.updateQuantity(item.book.id, currentQuantity + 1)
                     },
                     modifier = Modifier.size(30.dp),
                     contentPadding = PaddingValues(0.dp),

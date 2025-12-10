@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,8 +25,9 @@ fun Profile(
     navController: NavController,
     authViewModel: AuthViewModel
 ) {
-    val isLoggedIn = authViewModel.isLoggedIn.value
-    val username = authViewModel.currentUser.value?.name
+    val userState = authViewModel.loggedInUser.collectAsState()
+    val isLoggedIn = userState.value != null
+    val username = userState.value?.name
 
     Column(
         modifier = Modifier
